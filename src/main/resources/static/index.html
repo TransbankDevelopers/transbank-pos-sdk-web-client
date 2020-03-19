@@ -19,24 +19,10 @@
 <div id="main-content" class="container">
     <div class="row">
         <div class="col-md-6">
-            <form class="form-inline">
-                <div class="form-group">
-                    <label for="connect">Conexion WebSocket:</label>
-                    <button id="connect" class="btn btn-default" type="submit">Connect</button>
-                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
-                    </button>
-                </div>
-            </form>
+                <button id="send" class="btn btn-default">Listar Puertos</button>
         </div>
-        <div class="col-md-6">
-            <textarea readonly id="callmessage" rows="10" cols="50"></textarea>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <form class="form-inline">
-                <button id="send" class="btn btn-default" type="submit">Listar Puertos</button>
-            </form>
+        <div id="portInUse" class="col-md-6">
+            Puerto en uso: <span id="portUsed"></span> <button id="disconnectPort">Desconectar puerto</button>
         </div>
     </div>
     <div class="row">
@@ -52,58 +38,70 @@
             </table>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-6">
+            <textarea readonly id="callmessage" rows="5" cols="150"></textarea>
+        </div>
+    </div>
 
-    <div class="row" id="closePortDiv">
+    <div class="row" id="doSaleDiv">
         <div class="col-md-12">
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    <th>Cerrar el puerto</th>
+                    <th>Realizar venta</th>
                 </tr>
                 </thead>
-                <tbody id="closePortButtonContainer">
-                    <tr><td>
-                        <button id="closePort" class="btn btn-default" type="submit">Cerrar puerto</button>
-                    </td></tr>
+                <tbody id="doSaleContainer">
+                <tr>
+                    <td>
+                        <button id="buyCombo"><table><tr><td><img style="width: 250px;" src="combo1.png"/></td></tr>
+                        <tr><td>Hamburquesa, Papas Fritas, Bebida</td></tr>
+                        <tr><td>$5000</td></tr>
+                        </table></button>
+                    </td>
+                    <td>
+                        <button id="buySandwich"><table><tr><td><img style="width: 250px;" src="sandwich1.png"/></td></tr>
+                        <tr><td>Hamburguesa sola</td></tr>
+                        <tr><td>$3500</td></tr>
+                        </table></button>
+                    </td>
+                    <td>
+                        <button id="buyTaco"><table><tr><td><img style="width: 250px;" src="taco.png"/></td></tr>
+                        <tr><td>Taco</td></tr>
+                        <tr><td>$2000</td></tr>
+                        </table></button>
+                    </td>
+                    <td>
+                        <button id="buyCoffee"><table><tr><td><img style="width: 250px;" src="coffee1.png"/></td></tr>
+                        <tr><td>Cafe</td></tr>
+                        <tr><td>$1000</td></tr>
+                        </table></button>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="row" id="getKeysDiv">
+    <div class="row" id="actuallySellDiv">
         <div class="col-md-12">
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    <th>Cargar llaves</th>
+                    <th><h2>Total: <span>$ <span id="total"></span></span></h2></th>
                 </tr>
                 </thead>
-                <tbody id="getKeysButtonContainer">
-                <tr><td colspan="4">
-                    <button id="getKeys" class="btn btn-default" type="submit">Cargar llaves</button>
+                <tbody id="actuallySellContainer">
+                <tr><td colspan="6">
+                    <button id="doSale" class="btn btn-default" type="submit">Vender</button>
                 </td></tr>
-                <tr>
-                    <td>response code:</td>
-                    <td id="gk-responseCode" class="data"></td>
-                    <td>function code:</td>
-                    <td id="gk-functionCode" class="data"></td>
-                </tr>
-                <tr>
-                    <td>commerce code:</td>
-                    <td id="gk-commerceCode" class="data"></td>
-                    <td>terminal id:</td>
-                    <td id="gk-terminalId" class="data"></td>
-                </tr>
-                <tr>
-                    <td>message:</td>
-                    <td id="gk-message" class="data"></td>
-                </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="row" id="getLastSaleDiv">
+   <div class="row" id="getLastSaleDiv">
         <div class="col-md-12">
             <table class="table table-striped">
                 <thead>
@@ -172,82 +170,38 @@
         </div>
     </div>
 
-    <div class="row" id="doSaleDiv">
+    <div class="row" id="getKeysDiv">
         <div class="col-md-12">
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    <th>Realizar venta</th>
+                    <th>Cargar llaves</th>
                 </tr>
                 </thead>
-                <tbody id="doSaleContainer">
-                <tr><td colspan="2">
-                    <button id="doSale" class="btn btn-default" type="submit">Realizar venta</button>
-                </td>
-                    <td>
-                        Precio:
-                    </td>
-                    <td>
-                        <input id="previoVenta">
-                    </td>
-                </tr>
+                <tbody id="getKeysButtonContainer">
+                <tr><td colspan="4">
+                    <button id="getKeys" class="btn btn-default" type="submit">Cargar llaves</button>
+                </td></tr>
                 <tr>
                     <td>response code:</td>
-                    <td id="ds-responseCode" class="data"></td>
+                    <td id="gk-responseCode" class="data"></td>
                     <td>function code:</td>
-                    <td id="ds-functionCode" class="data"></td>
+                    <td id="gk-functionCode" class="data"></td>
+                </tr>
+                <tr>
                     <td>commerce code:</td>
-                    <td id="ds-commerceCode" class="data"></td>
-                </tr>
-                <tr>
+                    <td id="gk-commerceCode" class="data"></td>
                     <td>terminal id:</td>
-                    <td id="ds-terminalId" class="data"></td>
-                    <td>ticket:</td>
-                    <td id="ds-ticket" class="data"></td>
-                    <td>authorization code:</td>
-                    <td id="ds-authorizationCode" class="data"></td>
-                </tr>
-                <tr>
-                    <td>amount:</td>
-                    <td id="ds-amount" class="data"></td>
-                    <td>shares number:</td>
-                    <td id="ds-sharesNumber" class="data"></td>
-                    <td>shares amount:</td>
-                    <td id="ds-sharesAmount" class="data"></td>
-                </tr>
-                <tr>
-                    <td>last 4 digits:</td>
-                    <td id="ds-last4Digits" class="data"></td>
-                    <td>operation number:</td>
-                    <td id="ds-operationNumber" class="data"></td>
-                    <td>card type:</td>
-                    <td id="ds-cardType" class="data"></td>
-                </tr>
-                <tr>
-                    <td>accounting date:</td>
-                    <td id="ds-accountingDate" class="data"></td>
-                    <td>account number:</td>
-                    <td id="ds-accountNumber" class="data"></td>
-                    <td>card brand:</td>
-                    <td id="ds-cardBrand" class="data"></td>
-                </tr>
-                <tr>
-                    <td>real date:</td>
-                    <td id="ds-realDate" class="data"></td>
-                    <td>employee id:</td>
-                    <td id="ds-employeeId" class="data"></td>
-                    <td>tip:</td>
-                    <td id="ds-tip" class="data"></td>
+                    <td id="gk-terminalId" class="data"></td>
                 </tr>
                 <tr>
                     <td>message:</td>
-                    <td id="ds-message" class="data"></td>
+                    <td id="gk-message" class="data"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-
 
 </div>
 </body>

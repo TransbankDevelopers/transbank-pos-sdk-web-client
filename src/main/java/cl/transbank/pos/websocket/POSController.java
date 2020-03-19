@@ -7,6 +7,8 @@ import cl.transbank.pos.exceptions.TransbankLinkException;
 import cl.transbank.pos.helper.StringUtils;
 import cl.transbank.pos.responses.KeysResponse;
 import cl.transbank.pos.responses.SaleResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -19,39 +21,31 @@ import java.util.List;
 @Controller
 public class POSController {
 
-	static POS pos = null;
-
-	static {
-		try {
-			pos = POS.getInstance();
-		} catch (TransbankLinkException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error when initializing the POS");
-		}
-	}
-
+	private static final Logger logger = LogManager.getLogger(POSController.class);
 
 	@MessageMapping("/listPorts")
 	@SendTo("/topic/listPorts")
 	public PortNames listPorts() throws Exception {
-		List<String> portnames = pos.listPorts();
-		System.out.println("portnames: " + portnames);
+		List<String> portnames = POSService.listPorts();
+		logger.info("portnames: " + portnames);
 		return new PortNames(portnames);
 	}
 
 	@MessageMapping("/closePort")
 	@SendTo("/topic/closePort")
 	public PortStatus closePort() throws Exception {
+		logger.info("Closing port");
 		PortStatus result = new PortStatus();
 		result.setSuccess("TRUE");
 		result.setMessage("");
 		try {
-			pos.closePort();
+			POSService.closePort();
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.setSuccess("FALSE");
 			result.setMessage(e.getMessage());
 		}
+		logger.info("Closing port. Return " + result);
 		return result;
 	}
 
@@ -60,7 +54,7 @@ public class POSController {
 	public KeysStatus getKeys() throws Exception {
 		KeysStatus result = new KeysStatus();
 		try {
-			KeysResponse keysResponse = pos.loadKeys();
+			KeysResponse keysResponse = POSService.loadKeys();
 			result.setResponseCode(keysResponse.getResponseCode());
 			result.setFunctionCode(keysResponse.getFunctionCode());
 			result.setCommerceCode(keysResponse.getCommerceCode());
@@ -79,14 +73,15 @@ public class POSController {
 	public SaleStatus getLastSale() throws Exception {
 		SaleStatus result = new SaleStatus();
 		try {
-			SaleResponse saleResponse = pos.getLastSale();
+			SaleResponse saleResponse = POSService.getLastSale();
 			BeanUtils.copyProperties(saleResponse, result);
-			result.setMessage(null);
+			result.setMessage("");
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.setResponseCode(-1);
 			result.setMessage(e.getMessage());
 		}
+		logger.info("retornando");
 		return result;
 	}
 
@@ -95,7 +90,7 @@ public class POSController {
 	public SaleStatus doSale(SaleParams params) throws Exception {
 		SaleStatus result = new SaleStatus();
 		try {
-			SaleResponse saleResponse = pos.sale(StringUtils.parseInt(params.getAmount()), StringUtils.parseInt(params.getTicket()));
+			SaleResponse saleResponse = POSService.sale(StringUtils.parseInt(params.getAmount()), StringUtils.parseInt(params.getTicket()));
 			BeanUtils.copyProperties(saleResponse, result);
 			result.setMessage(null);
 		} catch (Exception e) {
@@ -109,13 +104,13 @@ public class POSController {
 	@MessageMapping("/openPort")
 	@SendTo("/topic/openPort")
 	public PortStatus openPort(OpenPortParam param) throws Exception {
-		System.out.println("param: " + param);
+		logger.info("param: " + param);
 		PortStatus result = new PortStatus();
 		result.setSuccess("TRUE");
 		result.setMessage("");
 		try {
-			pos.openPort(param.getPortname());
-			boolean success = pos.poll();
+			POSService.openPort(param.getPortname());
+			boolean success = POSService.poll();
 			if (!success) {
 				result.setSuccess("FALSE");
 				result.setMessage("El POS no respondió.");
@@ -129,7 +124,7 @@ public class POSController {
 			result.setSuccess("FALSE");
 			result.setMessage(e.getMessage());
 		}
-		System.out.println("port status: " + result);
+		logger.info("port status: " + result);
 		return result;
 	}
 }
