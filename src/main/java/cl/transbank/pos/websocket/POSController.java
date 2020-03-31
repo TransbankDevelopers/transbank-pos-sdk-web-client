@@ -71,11 +71,14 @@ public class POSController {
 	@MessageMapping("/getLastSale")
 	@SendTo("/topic/getLastSale")
 	public SaleStatus getLastSale() throws Exception {
+		logger.info("get last sale");
 		SaleStatus result = new SaleStatus();
 		try {
 			SaleResponse saleResponse = POSService.getLastSale();
+			logger.info("get last sale " + saleResponse);
 			BeanUtils.copyProperties(saleResponse, result);
 			result.setMessage("");
+			logger.info("get last sale: " + result);
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.setResponseCode(-1);
@@ -90,10 +93,14 @@ public class POSController {
 	public SaleStatus doSale(SaleParams params) throws Exception {
 		SaleStatus result = new SaleStatus();
 		try {
+			logger.info("doing sale");
 			SaleResponse saleResponse = POSService.sale(StringUtils.parseInt(params.getAmount()), StringUtils.parseInt(params.getTicket()));
+			logger.info("doing sale: " + saleResponse);
 			BeanUtils.copyProperties(saleResponse, result);
+			logger.info("doing sale: " + result);
 			result.setMessage(null);
 		} catch (Exception e) {
+			logger.error("doing sale. exception: " + e);
 			e.printStackTrace();
 			result.setResponseCode(-1);
 			result.setMessage(e.getMessage());

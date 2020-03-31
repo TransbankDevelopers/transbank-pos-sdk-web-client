@@ -224,7 +224,7 @@ function getLastSale() {
 }
 
 function doSale() {
-    stompClient.send("/app/doSale", {}, '');
+    stompClient.send("/app/doSale", {}, JSON.stringify({'amount':total, 'ticket':'1234'}));
     $.blockUI({ message: '<table style="text-align: center; width: 100%;"><tr><td><img style="width: 100%;" src="pos.png" /></td></tr>' +
     '<tr><td><h2>Debe operar el Punto de Venta</h2></td></tr></table>' });
     clearAllTables();

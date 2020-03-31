@@ -59,14 +59,14 @@ public class POSService {
 
     public static SaleResponse getLastSale() throws TransbankPortNotConfiguredException {
         if (fakeMode) {
-            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
+            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|31032020|0|0|01042020|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
         }
         return pos.getLastSale();
     }
 
     public static SaleResponse sale(int amount, int ticket) throws TransbankPortNotConfiguredException {
         if (fakeMode) {
-            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
+            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|31032020|0|0|01042020|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
         }
         return pos.sale(amount, ticket);
     }
