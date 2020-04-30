@@ -9,6 +9,6 @@ mvn package
 Para ejecutar el proyecto
 
 ```
-java -jar target/transbank-pos-sdk-java-websocket-demo-0.0.1-SNAPSHOT.jar
+java -jar target/transbank-pos-sdk-java-websocket-demo-1.0.0-SNAPSHOT.jar
 ```
 

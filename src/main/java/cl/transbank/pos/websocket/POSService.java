@@ -7,6 +7,8 @@ import cl.transbank.pos.exceptions.TransbankLinkException;
 import cl.transbank.pos.exceptions.TransbankPortNotConfiguredException;
 import cl.transbank.pos.responses.KeysResponse;
 import cl.transbank.pos.responses.SaleResponse;
+
+import cl.transbank.pos.utils.TransbankWrap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,21 +54,22 @@ public class POSService {
 
     public static KeysResponse loadKeys() throws TransbankPortNotConfiguredException {
         if (fakeMode) {
-            return new KeysResponse(0, 0, 0, "ok");
+            // return new KeysResponse(0, 0, 0, "ok");
+            return new KeysResponse(TransbankWrap.load_keys());
         }
         return pos.loadKeys();
     }
 
     public static SaleResponse getLastSale() throws TransbankPortNotConfiguredException {
         if (fakeMode) {
-            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|31032020|0|0|01042020|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
+            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|20202704|0|0|01052020|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
         }
         return pos.getLastSale();
     }
 
     public static SaleResponse sale(int amount, int ticket) throws TransbankPortNotConfiguredException {
         if (fakeMode) {
-            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|31032020|0|0|01042020|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
+            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|20202704|0|0|02052020|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
         }
         return pos.sale(amount, ticket);
     }
