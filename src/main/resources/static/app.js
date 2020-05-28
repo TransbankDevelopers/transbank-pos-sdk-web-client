@@ -1,4 +1,6 @@
-var stompClient = null;
+// import POS from 'transbank-pos-websocket';
+
+// var stompClient = null;
 
 var total = 0;
 
@@ -12,124 +14,6 @@ function setConnected(connected) {
         $("#conversation").hide();
     }
     $("#portlist").html("");
-}
-
-function connect() {
-    var socket = new SockJS('/tbk-sdk-java-websocket');
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
-        setConnected(true);
-        console.log('Connected: ' + frame);
-        console.log("subscribing to list ports!");
-        stompClient.subscribe('/topic/listPorts', function (result) {
-            $('#callmessage').html('LIST PORTS: ' + result.body);
-            createPortButtons(JSON.parse(result.body).ports);
-            $.unblockUI();
-        });
-        console.log("subscribing to openPort!");
-        stompClient.subscribe('/topic/openPort', function (result) {
-                $('#callmessage').html('OPEN PORT: ' + result.body);
-                var response = JSON.parse(result.body);
-                console.log("response: " + response);
-                if (response.success == 'TRUE') {
-                    console.log("show all");
-                    showAllClosedPort();
-                } else {
-                    console.log("hide all");
-                    hideAllClosedPort();
-                }
-                console.log("unblock");
-                $.unblockUI();
-        });
-        console.log("subscribing to closePort!");
-        stompClient.subscribe('/topic/closePort', function (result) {
-                $('#callmessage').html('CLOSE PORT: ' + result.body);
-                var response = JSON.parse(result.body);
-                if (response.success == 'TRUE') {
-                    console.log("hide all");
-                    hideAllClosedPort();
-                } else {
-                    console.log("show all");
-                    showAllClosedPort();
-               }
-               console.log("unblock");
-               $.unblockUI();
-        });
-        stompClient.subscribe('/topic/doSale', function (result) {
-                $('#callmessage').html('SALE: ' + result.body);
-                var response = JSON.parse(result.body);
-                if (response.success == 'TRUE') {
-                    console.log("hide all");
-                    total = 0;
-                    $('#total').text(total);
-                } else {
-                    console.log("show all");
-               }
-               console.log("unblock");
-               $.unblockUI();
-        });
-        console.log("subscribing to getKeys!");
-        stompClient.subscribe('/topic/getKeys', function (result) {
-                        $('#callmessage').html('GET KEYS: ' + result.body);
-                        var response = JSON.parse(result.body);
-                        $('#gk-functionCode').html(response.functionCode);
-                        $('#gk-responseCode').html(response.responseCode);
-                        $('#gk-commerceCode').html(response.commerceCode);
-                        $('#gk-terminalId').html(response.terminalId);
-                        $('#gk-message').html(response.message);
-                        $.unblockUI();
-        });
-        console.log("subscribing to doSale!");
-        stompClient.subscribe('/topic/doSale', function (result) {
-                        $('#callmessage').html('DO SALE: ' + result.body);
-                        var response = JSON.parse(result.body);
-                        $('#ds-functionCode').html(response.functionCode);
-                        $('#ds-responseCode').html(response.responseCode);
-                        $('#ds-commerceCode').html(response.commerceCode);
-                        $('#ds-terminalId').html(response.terminalId);
-                        $('#ds-ticket').html(response.ticket);
-                        $('#ds-authorizationCode').html(response.authorizationCode);
-                        $('#ds-amount').html(response.amount);
-                        $('#ds-sharesNumber').html(response.sharesNumber);
-                        $('#ds-last4Digits').html(response.last4Digits);
-                        $('#ds-operationNumber').html(response.operationNumber);
-                        $('#ds-cardType').html(response.cardType);
-                        $('#ds-accountingDate').html(response.accountingDate);
-                        $('#ds-accountNumber').html(response.accountNumber);
-                        $('#ds-cardBrand').html(response.cardBrand);
-                        $('#ds-realDate').html(response.realDate);
-                        $('#ds-employeeId').html(response.employeeId);
-                        $('#ds-tip').html(response.tip);
-                        $('#ds-message').html(response.message);
-                        $.unblockUI();
-        });
-        console.log("subscribing to lastSale!");
-        stompClient.subscribe('/topic/getLastSale', function (result) {
-                        $('#callmessage').html('GET LAST SALE: ' + result.body);
-                        var response = JSON.parse(result.body);
-                        $('#ls-functionCode').html(response.functionCode);
-                        $('#ls-responseCode').html(response.responseCode);
-                        $('#ls-commerceCode').html(response.commerceCode);
-                        $('#ls-terminalId').html(response.terminalId);
-                        $('#ls-ticket').html(response.ticket);
-                        $('#ls-authorizationCode').html(response.authorizationCode);
-                        $('#ls-amount').html(response.amount);
-                        $('#ls-sharesNumber').html(response.sharesNumber);
-                        $('#ls-last4Digits').html(response.last4Digits);
-                        $('#ls-operationNumber').html(response.operationNumber);
-                        $('#ls-cardType').html(response.cardType);
-                        $('#ls-accountingDate').html(response.accountingDate);
-                        $('#ls-accountNumber').html(response.accountNumber);
-                        $('#ls-cardBrand').html(response.cardBrand);
-                        $('#ls-realDate').html(response.realDate);
-                        $('#ls-employeeId').html(response.employeeId);
-                        $('#ls-tip').html(response.tip);
-                        $('#ls-message').html(response.message);
-                        $.unblockUI();
-        });
-        console.log("end subscriptions");
-    });
-
 }
 
 function sellCombo() {
@@ -158,8 +42,12 @@ function disconnect() {
 }
 
 function sendName() {
-    stompClient.send("/app/listPorts", {}, '');
-    $.blockUI();
+    POS.getPorts().then( function(result) {
+        $('#callmessage').html('LIST PORTS: ' + result);
+        createPortButtons(result);
+    }).catch(
+        error => console.log(error.message)
+    );
 }
 
 function createPortButtons(portList) {
@@ -180,16 +68,33 @@ function createPortButtons(portList) {
 }
 
 function openPort(portName) {
-    stompClient.send("/app/openPort", {}, JSON.stringify({'portname': portName.data}));
-    $('#portUsed').text(portName.data);
-    console.log("opening!");
-    $.blockUI();
+    POS.openPort(portName).then( function(result) {
+        $('#portUsed').text(portName.data);
+        if (result === 'TRUE') {
+            console.log("show all");
+            showAllClosedPort();
+        } else {
+            console.log("hide all");
+            hideAllClosedPort();
+        }
+    }).catch(
+        error => console.log(error.message)
+    );
 }
 
 function closePort() {
-    stompClient.send("/app/closePort", {}, '');
+    POS.closePort().then( function(result) {
+        if ( result === 'TRUE' ) {
+            console.log("hide all");
+            hideAllClosedPort();
+        } else {
+            console.log("show all");
+            showAllClosedPort();
+       }
+    }).catch(
+        error => console.log(error.message)
+    );
     $('#portUsed').text('Desconectado');
-    $.blockUI();
     clearAllTables();
 }
 
@@ -212,21 +117,74 @@ function showAllClosedPort() {
 }
 
 function getKeys() {
-    stompClient.send("/app/getKeys", {}, '');
-    $.blockUI();
+    // stompClient.send("/app/getKeys", {}, '');
+    POS.getKeys().then( function(result) {
+        $('#gk-functionCode').html(result.functionCode);
+        $('#gk-responseCode').html(result.responseCode);
+        $('#gk-commerceCode').html(result.commerceCode);
+        $('#gk-terminalId').html(result.terminalId);
+        $('#gk-message').html(result.message);
+    }).catch(
+        error => console.log(error.message)
+    );
     clearAllTables();
 }
 
 function getLastSale() {
-    stompClient.send("/app/getLastSale", {}, '');
-    $.blockUI();
+    POS.getLastSale().then( function(result) {
+        $('#callmessage').html('GET LAST SALE: ' + result);
+        $('#ls-functionCode').html(result.functionCode);
+        $('#ls-responseCode').html(result.responseCode);
+        $('#ls-commerceCode').html(result.commerceCode);
+        $('#ls-terminalId').html(result.terminalId);
+        $('#ls-ticket').html(result.ticket);
+        $('#ls-authorizationCode').html(result.authorizationCode);
+        $('#ls-amount').html(result.amount);
+        $('#ls-sharesNumber').html(result.sharesNumber);
+        $('#ls-last4Digits').html(result.last4Digits);
+        $('#ls-operationNumber').html(result.operationNumber);
+        $('#ls-cardType').html(result.cardType);
+        $('#ls-accountingDate').html(result.accountingDate);
+        $('#ls-accountNumber').html(result.accountNumber);
+        $('#ls-cardBrand').html(result.cardBrand);
+        $('#ls-realDate').html(result.realDate);
+        $('#ls-employeeId').html(result.employeeId);
+        $('#ls-tip').html(result.tip);
+        $('#ls-message').html(result.message);
+    }).catch(
+        error => console.log(error.message)
+    );
+    // stompClient.send("/app/getLastSale", {}, '');
     clearAllTables();
 }
 
 function doSale() {
-    stompClient.send("/app/doSale", {}, JSON.stringify({'amount':total, 'ticket':'1234'}));
     $.blockUI({ message: '<table style="text-align: center; width: 100%;"><tr><td><img style="width: 100%;" src="pos.png" /></td></tr>' +
     '<tr><td><h2>Debe operar el Punto de Venta</h2></td></tr></table>' });
+    POS.doSale( amount=total, ticket= '1234' ).then( function(result) {
+        $('#callmessage').html('DO SALE: ' + result);
+        $('#ds-functionCode').html(result.functionCode);
+        $('#ds-responseCode').html(result.responseCode);
+        $('#ds-commerceCode').html(result.commerceCode);
+        $('#ds-terminalId').html(result.terminalId);
+        $('#ds-ticket').html(result.ticket);
+        $('#ds-authorizationCode').html(result.authorizationCode);
+        $('#ds-amount').html(result.amount);
+        $('#ds-sharesNumber').html(result.sharesNumber);
+        $('#ds-last4Digits').html(result.last4Digits);
+        $('#ds-operationNumber').html(result.operationNumber);
+        $('#ds-cardType').html(result.cardType);
+        $('#ds-accountingDate').html(result.accountingDate);
+        $('#ds-accountNumber').html(result.accountNumber);
+        $('#ds-cardBrand').html(result.cardBrand);
+        $('#ds-realDate').html(result.realDate);
+        $('#ds-employeeId').html(result.employeeId);
+        $('#ds-tip').html(result.tip);
+        $('#ds-message').html(result.message);
+        total = 0;
+    }).catch(
+        error => console.log(error.message)
+    );
     clearAllTables();
 }
 
@@ -238,8 +196,8 @@ $(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
-    $( "#connect" ).click(function() { connect(); });
-    $( "#disconnect" ).click(function() { disconnect(); });
+    $( "#connect" ).click(function() { pos.connect(); });
+    $( "#disconnect" ).click(function() { pos.disconnect(); });
     $( "#send" ).click(function() { sendName(); });
     $('#closePortDiv').hide();
     $('#getKeysDiv').hide();
@@ -255,6 +213,5 @@ $(function () {
     $('#buyCoffee').click( sellCoffee );
     $('#actuallySellDiv').hide();
     $('#doSale').click( doSale );
-    connect();
 });
 
