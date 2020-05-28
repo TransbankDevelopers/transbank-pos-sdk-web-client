@@ -7,11 +7,16 @@ import cl.transbank.pos.exceptions.TransbankLinkException;
 import cl.transbank.pos.exceptions.TransbankPortNotConfiguredException;
 import cl.transbank.pos.responses.KeysResponse;
 import cl.transbank.pos.responses.SaleResponse;
+
+import cl.transbank.pos.utils.TransbankWrap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.text.SimpleDateFormat;
 
 public class POSService {
 
@@ -59,14 +64,26 @@ public class POSService {
 
     public static SaleResponse getLastSale() throws TransbankPortNotConfiguredException {
         if (fakeMode) {
-            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|31032020|0|0|01042020|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
+            Date date = new Date();
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, +7);
+            Date date2 = cal.getTime();
+            String dateString = new SimpleDateFormat("yyyy-MM-dd").format(date);
+            String fromdate = new SimpleDateFormat("dd-MM-yyyy").format(date2);
+            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|"+date+"|0|0|"+date2+"|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
         }
         return pos.getLastSale();
     }
 
     public static SaleResponse sale(int amount, int ticket) throws TransbankPortNotConfiguredException {
         if (fakeMode) {
-            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|31032020|0|0|01042020|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
+            Date date = new Date();
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, +7);
+            Date date2 = cal.getTime();
+            String dateString = new SimpleDateFormat("yyyy-MM-dd").format(date);
+            String fromdate = new SimpleDateFormat("dd-MM-yyyy").format(date2);
+            return new SaleResponse("0|0|0|0|0|0|0|0|0|0|0|0|"+date+"|0|0|"+date2+"|131415|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
         }
         return pos.sale(amount, ticket);
     }
