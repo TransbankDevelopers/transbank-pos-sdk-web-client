@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 
 public class POSService {
 
-    private static final boolean fakeMode = true;
+    private static final boolean fakeMode = false;
 
     private static final Logger logger = LogManager.getLogger(POSService.class);
 

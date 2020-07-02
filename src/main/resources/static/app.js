@@ -69,7 +69,6 @@ function createPortButtons(portList) {
 
 function openPort(portName) {
     POS.openPort(portName).then( function(result) {
-        $('#portUsed').text(portName.data);
         if (result === 'TRUE') {
             console.log("show all");
             showAllClosedPort();
