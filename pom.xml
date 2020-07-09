@@ -11,6 +11,7 @@
 	<groupId>cl.transbank.pos.websocket</groupId>
 	<artifactId>transbank-pos-sdk-java-websocket-demo</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>Websocket Java SDK Demo</name>
 	<description>Demo project for the Java SDK using Websockets</description>
 
