@@ -9,11 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>cl.transbank.pos.websocket</groupId>
-	<artifactId>transbank-pos-sdk-java-websocket-demo</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<artifactId>transbank-pos-sdk-web-client</artifactId>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
-	<name>Websocket Java SDK Demo</name>
-	<description>Demo project for the Java SDK using Websockets</description>
+	<name>Transbank POS SDK Web Client - Websocket Java</name>
+	<description>Client of the SDK Web for POS using Websockets</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>com.github.transbankdevelopers</groupId>
 			<artifactId>transbank-sdk-pos-java</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -73,6 +73,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>transbank-pos-sdk-web-client</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

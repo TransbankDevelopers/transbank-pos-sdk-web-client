@@ -8,7 +8,22 @@ Cliente **(este repositorio)**: Este cliente se debe instalar e inicializar en e
 
 [SDK Javascript](https://github.com/TransbankDevelopers/transbank-pos-sdk-web-js): Este SDK se debe instalar en el software de caja (o cualquier software web que presente HTML, CSS y JS en un navegador web). Este SDK entrega una interfaz simple para conectarse con el cliente, de manera que se puedan mandar instrucciones al POS con un API fácil de usar. 
 
-## Instalación
+## Quick start
+
+Este es un proyecto construido en Java. En cada nueva versión (release) se incluye el .jar que se puede ejecutar directamente (teniendo Java instalado). 
+
+Una vez descargado el archivo '.jar' desde el último release del proyecto, se debe inicializar el servicio:
+```bash
+java -jar transbank-pos-sdk-web-client.jar
+```
+Descargar archivo: [https://github.com/TransbankDevelopers/transbank-pos-sdk-web-client/releases](https://github.com/TransbankDevelopers/transbank-pos-sdk-web-client/releases)
+
+# Inicie automático
+Ejecutando el comando antes mencionado, se inicia el servicio manualmente. El objetivo es que este .jar se ejecute en todo momento, por lo que se recomienda buscar una forma de inicializarlo automáticamente cuando el computador se inicie. 
+Próximamente agregaremos recomendaciones sobre este proceso. Si tienen sugerencias, son bienvenidas en los 'issues' de este repositorio en Github. 
+
+
+## Compilar manualmente
 Para correr el proyecto, primero compilar.
 
 Antes de comenzar, debes asegurarte de descargar el archivo [TransbankWrap.dll](https://github.com/TransbankDevelopers/transbank-pos-sdk-c/releases/download/V3.0.0/TransbankWrapJava.dll) y dejarlo en una ubicación fija dentro del computador. (Ej: `C:/Pos/TransbankWrap.dll`). 
@@ -17,13 +32,13 @@ Posteriormente, debes generar una variable de entorno del sistema llamada `NATIV
 Este proyecto está desarollado en Java, por lo que se requiere tener Java y MVN instalado. 
 
 Para correr el proyecto, primero entrar a la carpeta del proyecto y compilar. 
-```
+```bash
 mvn package
 ```
 
 Para ejecutar el proyecto: 
-```
-java -jar target/transbank-pos-sdk-java-websocket-demo-1.0.0-SNAPSHOT.jar
+```bash
+java -jar target/transbank-pos-sdk-web-client.jar
 ```
 
 Una vez ejecutado, ya se puede conectar usando el SDK de javascript apra interactuar de manera simple con el POS a través de la web. 
