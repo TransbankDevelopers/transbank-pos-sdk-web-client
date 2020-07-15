@@ -5,13 +5,14 @@ Este proyecto es parte del SDK Web para POS integrado.
 Este SDK Web consta de dos partes: 
 
 Cliente **(este repositorio)**: Este cliente se debe instalar e inicializar en el computador que tendrá el equipo POS conectado físicamente. Al instalar e inicializar este servicio, se creará un servidor de websockets local en el puerto 8090, que permitirá, a través del SDK de javascript, poder enviar y recibir mensajes al equipo POS, de manera simple y transparente. 
-
 [SDK Javascript](https://github.com/TransbankDevelopers/transbank-pos-sdk-web-js): Este SDK se debe instalar en el software de caja (o cualquier software web que presente HTML, CSS y JS en un navegador web). Este SDK entrega una interfaz simple para conectarse con el cliente, de manera que se puedan mandar instrucciones al POS con un API fácil de usar. 
 
-## Quick start
+## Quick start 
+Antes de comenzar, debes asegurarte de descargar el archivo [TransbankWrap.dll](https://github.com/TransbankDevelopers/transbank-pos-sdk-c/releases/download/V3.0.0/TransbankWrapJava.dll) y dejarlo en una ubicación fija dentro del computador. (Ej: `C:/Pos/TransbankWrap.dll`). 
+Posteriormente, debes generar una variable de entorno del sistema llamada `NATIVE_TRANSBANK_WRAP` que tenga la ubicación del archivo. (Ej: `C://Pos//TransbankWrap.dll`)
+También debes descargar la librería [libserialport-0.dll](https://github.com/TransbankDevelopers/transbank-pos-sdk-c/releases/latest) y dejarla en la carpeta `System32`. 
 
-Este es un proyecto construido en Java. En cada nueva versión (release) se incluye el .jar que se puede ejecutar directamente (teniendo Java instalado). 
-
+Este es un proyecto construido en Java. En cada nueva versión (release) se incluye el .jar que se puede ejecutar directamente (teniendo Java instalado).
 Una vez descargado el archivo '.jar' desde el último release del proyecto, se debe inicializar el servicio:
 ```bash
 java -jar transbank-pos-sdk-web-client.jar
@@ -24,18 +25,12 @@ Próximamente agregaremos recomendaciones sobre este proceso. Si tienen sugerenc
 
 
 ## Compilar manualmente
-Para correr el proyecto, primero compilar.
-
-Antes de comenzar, debes asegurarte de descargar el archivo [TransbankWrap.dll](https://github.com/TransbankDevelopers/transbank-pos-sdk-c/releases/download/V3.0.0/TransbankWrapJava.dll) y dejarlo en una ubicación fija dentro del computador. (Ej: `C:/Pos/TransbankWrap.dll`). 
-Posteriormente, debes generar una variable de entorno del sistema llamada `NATIVE_TRANSBANK_WRAP` que tenga la ubicación del archivo. (Ej: `C://Pos//TransbankWrap.dll`)
-
 Este proyecto está desarollado en Java, por lo que se requiere tener Java y MVN instalado. 
 
 Para correr el proyecto, primero entrar a la carpeta del proyecto y compilar. 
 ```bash
 mvn package
 ```
-
 Para ejecutar el proyecto: 
 ```bash
 java -jar target/transbank-pos-sdk-web-client.jar
