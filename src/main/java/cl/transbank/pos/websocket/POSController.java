@@ -1,172 +1,262 @@
 package cl.transbank.pos.websocket;
 
-import cl.transbank.pos.POS;
-import cl.transbank.pos.exceptions.TransbankCannotOpenPortException;
-import cl.transbank.pos.exceptions.TransbankInvalidPortException;
-import cl.transbank.pos.exceptions.TransbankLinkException;
-import cl.transbank.pos.exceptions.TransbankUnexpectedError;
+import cl.transbank.pos.exceptions.*;
 import cl.transbank.pos.helper.StringUtils;
-import cl.transbank.pos.responses.KeysResponse;
-import cl.transbank.pos.responses.SaleResponse;
+import cl.transbank.pos.responses.*;
+import cl.transbank.pos.websocket.params.OpenPortParam;
+import cl.transbank.pos.websocket.params.SaleParams;
+import cl.transbank.pos.websocket.responses.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.BeanUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.util.HtmlUtils;
-import sun.security.x509.SubjectAlternativeNameExtension;
 
 import java.util.List;
 
 @Controller
 public class POSController {
 
-	private static final Logger logger = LogManager.getLogger(POSController.class);
-	private static boolean isConnected = false;
-	private static String currentPort = null;
+    private static final Logger logger = LogManager.getLogger(POSController.class);
+    private static boolean isConnected = false;
+    private static String currentPort = null;
 
 
-	@MessageMapping("/listPorts")
-	@SendTo("/topic/listPorts")
-	public PortNames listPorts() throws Exception {
-		List<String> portnames = POSService.listPorts();
-		logger.info("portnames: " + portnames);
-		return new PortNames(portnames);
-	}
+    @MessageMapping("/listPorts")
+    @SendTo("/topic/listPorts")
+    public ListPortsWebSocketResponse listPorts() throws Exception {
+        List<String> portNames = POSService.listPorts();
+        ListPortsWebSocketResponse response = new ListPortsWebSocketResponse();
+        response.setPorts(portNames);
+        response.setSuccess(true);
+        logger.info("portnames: " + portNames);
+        return response;
+    }
 
-	@MessageMapping("/closePort")
-	@SendTo("/topic/closePort")
-	public PortStatus closePort() throws Exception {
-	    logger.info("Closing port");
-        PortStatus result = new PortStatus();
+    @MessageMapping("/closePort")
+    @SendTo("/topic/closePort")
+    public PortStatusWebSocketResponse closePort() throws Exception {
+        logger.info("Closing port");
+        PortStatusWebSocketResponse result = new PortStatusWebSocketResponse();
         result.setSuccess(true);
         result.setMessage("");
 
-	    if (!isConnected) {
-	        logger.info("Port is not open, so we do not need to close it");
-	        result.setMessage("Port was not open");
-	    }
+        if (!isConnected) {
+            logger.info("Port is not open, so we do not need to close it");
+            result.setMessage("Port was not open");
+        }
 
-		try {
-			POSService.closePort();
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.setSuccess(false);
-			result.setMessage(e.getMessage());
-		}
-		isConnected = false;
-		currentPort = null;
-		logger.info("Closing port. Return " + result);
-		return result;
-	}
+        try {
+            POSService.closePort();
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setSuccess(false);
+            result.setMessage(e.getMessage());
+        }
+        isConnected = false;
+        currentPort = null;
+        logger.info("Closing port. Return " + result);
+        return result;
+    }
 
-	@MessageMapping("/getPortStatus")
+    @MessageMapping("/getPortStatus")
     @SendTo("/topic/getPortStatus")
-    public PortStatus getPortStatus() throws Exception {
-        PortStatus result = new PortStatus();
+    public PortStatusWebSocketResponse getPortStatus() throws Exception {
+        PortStatusWebSocketResponse result = new PortStatusWebSocketResponse();
         result.setSuccess(isConnected);
         result.setActivePort(currentPort);
         return result;
     }
 
-	@MessageMapping("/getKeys")
-	@SendTo("/topic/getKeys")
-	public KeysStatus getKeys() throws Exception {
-		KeysStatus result = new KeysStatus();
-		try {
-			KeysResponse keysResponse = POSService.loadKeys();
-			result.setResponseCode(keysResponse.getResponseCode());
-			result.setFunctionCode(keysResponse.getFunctionCode());
-			result.setCommerceCode(keysResponse.getCommerceCode());
-			result.setTerminalId(keysResponse.getTerminalId());
-			result.setMessage(null);
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.setResponseCode(-1);
-			result.setMessage(e.getMessage());
-		}
-		return result;
-	}
-
-	@MessageMapping("/getLastSale")
-	@SendTo("/topic/getLastSale")
-	public SaleStatus getLastSale() throws Exception {
-		logger.info("get last sale");
-		SaleStatus result = new SaleStatus();
-		try {
-			SaleResponse saleResponse = POSService.getLastSale();
-			logger.info("get last sale " + saleResponse);
-			BeanUtils.copyProperties(saleResponse, result);
-			result.setMessage("");
-			logger.info("get last sale: " + result);
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.setResponseCode(-1);
-			result.setMessage(e.getMessage());
-		}
-		logger.info("retornando");
-		return result;
-	}
-
-	@MessageMapping("/doSale")
-	@SendTo("/topic/doSale")
-	public SaleStatus doSale(SaleParams params) throws Exception {
-		SaleStatus result = new SaleStatus();
-		try {
-			logger.info("doing sale");
-			SaleResponse saleResponse = POSService.sale(StringUtils.parseInt(params.getAmount()), StringUtils.parseInt(params.getTicket()));
-			logger.info("doing sale: " + saleResponse);
-			BeanUtils.copyProperties(saleResponse, result);
-			logger.info("doing sale: " + result);
-			result.setMessage(null);
-		} catch (Exception e) {
-			logger.error("doing sale. exception: " + e);
-			e.printStackTrace();
-			result.setResponseCode(-1);
-			result.setMessage(e.getMessage());
-		}
-
-		return result;
-	}
-
-	@MessageMapping("/openPort")
-	@SendTo("/topic/openPort")
-	public PortStatus openPort(OpenPortParam param) throws Exception {
-		logger.info("param: " + param);
-		PortStatus result = new PortStatus();
-		result.setSuccess(true);
-		result.setMessage("");
-
-		if (isConnected) {
-		    closePort();
-		}
-
-		try {
-			POSService.openPort(param.getPortname());
-			boolean success = POSService.poll();
-			if (!success) {
-				result.setSuccess(false);
-				result.setMessage("El POS no respondió.");
-			}
-		} catch (TransbankInvalidPortException e) {
-			e.printStackTrace();
-			result.setSuccess(false);
-			result.setMessage(e.getMessage());
-		} catch (TransbankCannotOpenPortException e) {
-			e.printStackTrace();
-			result.setSuccess(false);
-			result.setMessage(e.getMessage());
-		} catch (TransbankUnexpectedError e) { //TODO: Cambiar esto, ya que se genera por el error en TBK return diferente a 0  o -1
-		    e.printStackTrace();
+    @MessageMapping("/getKeys")
+    @SendTo("/topic/getKeys")
+    public LoadKeysWebSocketResponse getKeys() throws Exception {
+        LoadKeysWebSocketResponse result = new LoadKeysWebSocketResponse();
+        try {
+            KeysResponse keysResponse = POSService.loadKeys();
+            result.setResponse(keysResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
             result.setSuccess(false);
             result.setMessage(e.getMessage());
-		}
+        }
+        return result;
+    }
 
-		isConnected = true;
-        currentPort = param.getPortname();
+    @MessageMapping("/closeDay")
+    @SendTo("/topic/closeDay")
+    public CloseDayWebSocketResponse closeDay() {
+        logger.info("Close Day");
+        CloseDayWebSocketResponse response = new CloseDayWebSocketResponse();
+        response.setSuccess(false);
+        try {
+            CloseResponse saleResponse = POSService.close();
+            response.setMessage(saleResponse.getResponseMessage());
+            response.setSuccess(true);
+        } catch (TransbankPortNotConfiguredException e) {
+            e.printStackTrace();
+            response.setMessage(e.getMessage());
+        }
+        return response;
+    }
 
-		logger.info("port status: " + result);
-		return result;
-	}
+    @MessageMapping("/getDetails")
+    @SendTo("/topic/getDetails")
+    public GetDetailsWebSocketResponse getDetails(boolean printOnPos) {
+        logger.info("Get sales of the day");
+        GetDetailsWebSocketResponse response = new GetDetailsWebSocketResponse();
+
+        try {
+            List<DetailResponse> details = POSService.details(printOnPos);
+            response.setDetails(details);
+            response.setSuccess(true);
+        } catch (TransbankPortNotConfiguredException e) {
+            response.setSuccess(false);
+            response.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @MessageMapping("/refund")
+    @SendTo("/topic/refund")
+    public RefundWebSocketResponse refund(int operationId) {
+        logger.info("Refund");
+        RefundWebSocketResponse response = new RefundWebSocketResponse();
+
+        try {
+            RefundResponse posResponse = POSService.refund(operationId);
+            response.setRefund(posResponse);
+            response.setSuccess(true);
+        } catch (TransbankPortNotConfiguredException e) {
+            response.setSuccess(false);
+            response.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @MessageMapping("/getTotals")
+    @SendTo("/topic/getTotals")
+    public TotalsWebSocketResponse getTotals() {
+        logger.info("Get totals");
+        TotalsWebSocketResponse response = new TotalsWebSocketResponse();
+        try {
+            TotalsResponse posResponse = POSService.getTotals();
+            response.setTotals(posResponse);
+            response.setSuccess(true);
+        } catch (TransbankPortNotConfiguredException e) {
+            response.setMessage(e.getMessage());
+            response.setSuccess(false);
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @MessageMapping("/setNormalMode")
+    @SendTo("/topic/setNormalMode")
+    public SetNormalModeWebSocketResponse setNormalMode() {
+        logger.info("Set normal mode");
+        SetNormalModeWebSocketResponse response = new SetNormalModeWebSocketResponse();
+        response.setSuccess(false);
+        try {
+            boolean saleResponse = POSService.setNormalMode();
+            response.setMessage("");
+            response.setSuccess(saleResponse);
+        } catch (TransbankPortNotConfiguredException e) {
+            e.printStackTrace();
+            response.setMessage(e.getMessage());
+        }
+        return response;
+    }
+
+    @MessageMapping("/poll")
+    @SendTo("/topic/poll")
+    public PollWebSocketResponse poll() {
+        logger.info("Poll");
+        PollWebSocketResponse response = new PollWebSocketResponse();
+        response.setSuccess(false);
+        try {
+            boolean saleResponse = POSService.setNormalMode();
+            response.setMessage("");
+            response.setSuccess(saleResponse);
+        } catch (TransbankPortNotConfiguredException e) {
+            e.printStackTrace();
+            response.setMessage(e.getMessage());
+        }
+        return response;
+    }
+
+    @MessageMapping("/getLastSale")
+    @SendTo("/topic/getLastSale")
+    public LastSaleWebSocketResponse getLastSale() throws Exception {
+        logger.info("get last sale");
+        LastSaleWebSocketResponse response = new LastSaleWebSocketResponse();
+        try {
+            SaleResponse saleResponse = POSService.getLastSale();
+            response.setSale(saleResponse);
+            response.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setSuccess(false);
+            response.setMessage(e.getMessage());
+        }
+        return response;
+    }
+
+    @MessageMapping("/doSale")
+    @SendTo("/topic/doSale")
+    public SaleWebSocketResponse doSale(SaleParams params) {
+        SaleWebSocketResponse response = new SaleWebSocketResponse();
+        try {
+            logger.info("Doing sale");
+            SaleResponse saleResponse = POSService.sale(StringUtils.parseInt(params.getAmount()), StringUtils.parseInt(params.getTicket()));
+            response.setSale(saleResponse);
+            response.setSuccess(true);
+        } catch (Exception e) {
+            logger.error("Doing sale. exception: " + e);
+            e.printStackTrace();
+            response.setSuccess(false);
+            response.setMessage(e.getMessage());
+        }
+
+        return response;
+    }
+
+    @MessageMapping("/openPort")
+    @SendTo("/topic/openPort")
+    public OpenPortWebSocketResponse openPort(OpenPortParam param) throws Exception {
+        logger.info("param: " + param);
+        OpenPortWebSocketResponse result = new OpenPortWebSocketResponse();
+        result.setSuccess(false);
+        if (isConnected) {
+            logger.info("Closing port before opening new one");
+            closePort();
+        }
+
+        try {
+            POSService.openPort(param.getPortname());
+            boolean success = POSService.poll();
+            if (!success) {
+                result.setMessage("El POS no respondió.");
+            } else {
+                result.setSuccess(true);
+            }
+        } catch (TransbankInvalidPortException | TransbankCannotOpenPortException | TransbankUnexpectedError e) {
+            e.printStackTrace();
+            result.setMessage(e.getMessage());
+        } //TODO: Cambiar esto, ya que se genera por el error en TBK return diferente a 0  o -1
+
+
+        isConnected = result.getSuccess();
+        if (isConnected) {
+            currentPort = param.getPortname();
+        }
+
+
+        logger.info("port status: " + result);
+        return result;
+    }
 }

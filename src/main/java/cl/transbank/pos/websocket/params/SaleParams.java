@@ -1,4 +1,4 @@
-package cl.transbank.pos.websocket;
+package cl.transbank.pos.websocket.params;
 
 public class SaleParams {
     private String amount, ticket;

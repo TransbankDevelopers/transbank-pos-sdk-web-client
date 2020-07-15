@@ -5,8 +5,7 @@ import cl.transbank.pos.exceptions.TransbankCannotOpenPortException;
 import cl.transbank.pos.exceptions.TransbankInvalidPortException;
 import cl.transbank.pos.exceptions.TransbankLinkException;
 import cl.transbank.pos.exceptions.TransbankPortNotConfiguredException;
-import cl.transbank.pos.responses.KeysResponse;
-import cl.transbank.pos.responses.SaleResponse;
+import cl.transbank.pos.responses.*;
 
 import cl.transbank.pos.utils.TransbankWrap;
 import org.apache.logging.log4j.LogManager;
@@ -88,11 +87,11 @@ public class POSService {
         return pos.sale(amount, ticket);
     }
 
-    public static void openPort(String portname) throws TransbankCannotOpenPortException, TransbankInvalidPortException {
+    public static void openPort(String portName) throws TransbankCannotOpenPortException, TransbankInvalidPortException {
         if (fakeMode) {
             return;
         }
-        pos.openPort(portname);
+        pos.openPort(portName);
     }
 
     public static boolean poll() throws TransbankPortNotConfiguredException {
@@ -100,5 +99,35 @@ public class POSService {
             return true;
         }
         return pos.poll();
+    }
+
+    public static TotalsResponse getTotals() throws TransbankPortNotConfiguredException {
+        if (fakeMode) {
+            // TODO: return fake TotalResponse
+        }
+
+        return pos.getTotals();
+    }
+
+    public static RefundResponse refund(int operationId) throws TransbankPortNotConfiguredException {
+        if (fakeMode) {
+            // TODO: return fake RefundResponse
+        }
+        return pos.refund(operationId);
+    }
+
+    public static List<DetailResponse> details(boolean printOnPos) throws TransbankPortNotConfiguredException {
+        if (fakeMode) {
+            // TODO: return fake List<DetailResponse>
+        }
+        return pos.details(printOnPos);
+    }
+
+    public static CloseResponse close() throws TransbankPortNotConfiguredException {
+        return pos.close();
+    }
+
+    public static boolean setNormalMode() throws TransbankPortNotConfiguredException {
+        return pos.setNormalMode();
     }
 }

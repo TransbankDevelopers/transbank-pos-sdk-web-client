@@ -1,13 +1,11 @@
-package cl.transbank.pos.websocket;
+package cl.transbank.pos.websocket.responses;
+
+import cl.transbank.pos.websocket.WebSocketResponse;
 
 import java.util.List;
 
-public class PortNames {
+public class ListPortsWebSocketResponse extends WebSocketResponse {
     private List<String> ports;
-
-    public PortNames(List<String> portnames) {
-        ports = portnames;
-    }
 
     public List<String> getPorts() {
         return ports;
