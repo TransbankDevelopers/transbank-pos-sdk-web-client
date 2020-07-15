@@ -10,10 +10,10 @@
 	</parent>
 	<groupId>cl.transbank.pos.websocket</groupId>
 	<artifactId>transbank-pos-sdk-web-client</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
-	<name>Transbank POS SDK Web Client - Websocket Java</name>
-	<description>Client of the SDK Web for POS using Websockets</description>
+	<name>Transbank POS SDK Web Client - WebSocket Java</name>
+	<description>Client of the SDK Web for POS using WebSockets</description>
 
 	<properties>
 		<java.version>1.8</java.version>
