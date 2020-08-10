@@ -74,6 +74,7 @@ public class POSController {
         LoadKeysWebSocketResponse result = new LoadKeysWebSocketResponse();
         try {
             KeysResponse keysResponse = POSService.loadKeys();
+            result.setSuccess(true);
             result.setResponse(keysResponse);
         } catch (Exception e) {
             e.printStackTrace();
