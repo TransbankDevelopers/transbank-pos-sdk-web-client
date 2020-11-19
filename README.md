@@ -1,4 +1,7 @@
-# Transbank SDK Web - Cliente
+# Este proyecto esta deprecado.
+Lo archivaremos y no recibirá actualizaciones.
+
+## Transbank SDK Web - Cliente
 Este proyecto es parte del SDK Web para POS integrado. 
 
 ## SDK Web POS Integrado
